@@ -10,7 +10,15 @@ class PitchRequest(BaseModel):
 @router.post("/generate-pitch")
 async def generate_pitch(request: PitchRequest):
     try:
+        if not request.profile:
+            raise HTTPException(status_code=400, detail="Profile cannot be empty")
+            
         pitch_content = generate_pitch_content(request.profile)
         return {"pitch": pitch_content}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Failed to generate pitch: {str(e)}"
+        )
