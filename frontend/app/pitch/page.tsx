@@ -27,6 +27,9 @@ export default function PitchPage() {
   const [pitch, setPitch] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [telegramLoading, setTelegramLoading] = useState(false);
+  const [telegramError, setTelegramError] = useState<string | null>(null);
+  const [telegramSuccess, setTelegramSuccess] = useState<boolean>(false);
 
   const handleGeneratePitch = async () => {
     if (!profile.trim()) {
@@ -70,6 +73,40 @@ export default function PitchPage() {
     }
   };
 
+  const handleSendTelegram = async () => {
+    if (!pitch) return;
+
+    console.log('Envoi Telegram en cours...', { pitch, chat_id: '7680811416' });
+    setTelegramLoading(true);
+    setTelegramError(null);
+    setTelegramSuccess(false);
+
+    try {
+      const response = await axios.post('http://localhost:8000/send-telegram', {
+        message: pitch,
+        chat_id: '7680811416',
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        timeout: 10000
+      });
+      console.log('Réponse du serveur:', response.data);
+      setTelegramSuccess(true);
+    } catch (err: unknown) {
+      console.error('Erreur Telegram:', err);
+      if (isAxiosError(err)) {
+        setTelegramError(`Erreur ${err.response?.status} - ${err.response?.statusText}`);
+      } else if (err instanceof Error) {
+        setTelegramError(`Erreur: ${err.message}`);
+      } else {
+        setTelegramError('Une erreur inconnue est survenue');
+      }
+    } finally {
+      setTelegramLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen p-4 max-w-md mx-auto">
       <h1 className="text-2xl font-bold mb-6">Générateur de Pitch</h1>
@@ -108,6 +145,31 @@ export default function PitchPage() {
         <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200 whitespace-pre-line">
           <h2 className="font-semibold mb-2">Votre pitch :</h2>
           <p>{pitch}</p>
+          <button
+            className="mt-4 w-full bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={handleSendTelegram}
+            disabled={telegramLoading}
+          >
+            {telegramLoading ? (
+              <span className="flex items-center justify-center">
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Envoi en cours...
+              </span>
+            ) : '📩 M’envoyer ce pitch sur Telegram'}
+          </button>
+          {telegramError && (
+            <div className="mt-4 p-3 bg-red-50 text-red-600 rounded-lg border border-red-200">
+              {telegramError}
+            </div>
+          )}
+          {telegramSuccess && (
+            <div className="mt-4 p-3 bg-green-50 text-green-600 rounded-lg border border-green-200">
+              Message envoyé avec succès !
+            </div>
+          )}
         </div>
       )}
     </div>
