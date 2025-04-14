@@ -1,0 +1,14 @@
+# Fichiers sensibles
+.env
+*.key
+*.pem
+credentials.json
+
+# Fichiers système
+.DS_Store
+
+# Dependencies
+node_modules/
+
+# Environnements virtuels
+venv/
