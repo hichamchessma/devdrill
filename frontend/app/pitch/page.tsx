@@ -12,7 +12,7 @@ type AxiosErrorWithResponse = {
   response?: {
     status: number;
     statusText: string;
-    data: any;
+    data: unknown;
   };
   code?: string;
   message: string;
