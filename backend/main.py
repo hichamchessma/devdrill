@@ -10,6 +10,7 @@ load_dotenv(dotenv_path=Path(__file__).parent / ".env")
 from backend.routes.generate_test import router as generate_test_router
 from backend.routes.generate_pitch import router as generate_pitch_router
 from backend.routes.send_telegram import router as send_telegram_router
+from backend.routes.stripe_payment import router as stripe_payment_router
 
 app = FastAPI()
 router = APIRouter()
@@ -25,6 +26,7 @@ app.add_middleware(
 app.include_router(generate_test_router)
 app.include_router(generate_pitch_router)
 app.include_router(send_telegram_router)
+app.include_router(stripe_payment_router)
 
 @app.get("/")
 async def root():

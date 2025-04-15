@@ -76,7 +76,20 @@ export default function UpgradePage() {
           <span className="text-xl font-bold text-gray-800 mb-2">DevDrill Pro – 9€/mois</span>
           <button
             className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-8 rounded-lg text-lg transition"
-            onClick={() => router.push("/payment")}
+            onClick={async () => {
+              if (!user) return;
+              const res = await fetch("http://localhost:8000/api/create-checkout-session", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ user_id: user.id })
+              });
+              const data = await res.json();
+              if (data.url) {
+                window.location.href = data.url;
+              } else {
+                alert("Erreur lors de la création de la session de paiement.");
+              }
+            }}
           >
             Passer en Pro
           </button>
