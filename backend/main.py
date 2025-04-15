@@ -1,14 +1,15 @@
 from fastapi import FastAPI, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
+from pathlib import Path
 import os
 
-# Load environment variables from .env file
-load_dotenv()
+# Load environment variables from the backend/.env file explicitly
+load_dotenv(dotenv_path=Path(__file__).parent / ".env")
 
-from routes.generate_test import router as generate_test_router
-from routes.generate_pitch import router as generate_pitch_router
-from routes.send_telegram import router as send_telegram_router
+from backend.routes.generate_test import router as generate_test_router
+from backend.routes.generate_pitch import router as generate_pitch_router
+from backend.routes.send_telegram import router as send_telegram_router
 
 app = FastAPI()
 router = APIRouter()

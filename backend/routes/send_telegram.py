@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, UploadFile, File, Form
 from pydantic import BaseModel
-from services.telegram_service import send_telegram_message
+from backend.services.telegram_service import send_telegram_message
 import logging
 import requests
 import os

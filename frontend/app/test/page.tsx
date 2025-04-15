@@ -2,6 +2,8 @@
 
 import { useState, ChangeEvent, FormEvent } from 'react';
 import { saveToHistory } from '@/utils/history';
+import FreemiumModal from './FreemiumModal';
+import { useFreemiumLimit } from '@/utils/useFreemiumLimit';
 
 interface TestForm {
   stack: string;
@@ -13,6 +15,8 @@ export default function TestPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<string | null>(null);
+
+  const { registerGeneration } = useFreemiumLimit();
 
   const handleSelectChange = (e: ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -41,7 +45,8 @@ export default function TestPage() {
         throw new Error('Format de réponse invalide');
       }
       setResult(data.content);
-    saveToHistory({ type: "test", title: `${formData.stack} (${formData.level})`, content: data.content });
+      saveToHistory({ type: "test", title: `${formData.stack} (${formData.level})`, content: data.content });
+      registerGeneration();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur inconnue');
     } finally {
@@ -50,7 +55,9 @@ export default function TestPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+    <>
+      <FreemiumModal />
+      <div className="min-h-screen bg-gray-50 p-4 md:p-8">
       <h1 className="text-2xl font-bold mb-6 text-gray-800">Générateur de Test IA</h1>
       
       <form onSubmit={handleSubmit} className="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md">
@@ -110,5 +117,6 @@ export default function TestPage() {
         </div>
       )}
     </div>
+    </>
   );
 }

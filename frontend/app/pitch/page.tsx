@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { generatePDF } from '@/utils/pdfUtils';
 import { saveToHistory } from '@/utils/history';
+import FreemiumModal from '../components/FreemiumModal';
 
 interface PitchResponse {
   pitch: string;
@@ -24,6 +25,8 @@ const isAxiosError = (error: unknown): error is AxiosErrorWithResponse => {
   return typeof error === 'object' && error !== null && 'isAxiosError' in error;
 };
 
+import { useFreemiumLimit } from '@/utils/useFreemiumLimit';
+
 export default function PitchPage() {
   const [profile, setProfile] = useState('5 an java exp');
   const [pitch, setPitch] = useState<string | null>(null);
@@ -36,6 +39,8 @@ export default function PitchPage() {
   const [telegramPDFLoading, setTelegramPDFLoading] = useState(false);
   const [telegramPDFError, setTelegramPDFError] = useState<string | null>(null);
   const [telegramPDFSuccess, setTelegramPDFSuccess] = useState<boolean>(false);
+
+  const { registerGeneration, currentCount, dailyLimit, canGenerate } = useFreemiumLimit();
 
   const handleGeneratePitch = async () => {
     if (!profile.trim()) {
@@ -59,7 +64,8 @@ export default function PitchPage() {
         }
       );
       setPitch(data.pitch);
-    saveToHistory({ type: "pitch", title: profile, content: data.pitch });
+      saveToHistory({ type: "pitch", title: profile, content: data.pitch });
+      registerGeneration();
     } catch (err: unknown) {
       if (isAxiosError(err)) {
         if (err.code === 'ECONNABORTED') {
@@ -160,7 +166,9 @@ export default function PitchPage() {
 
 
   return (
-    <div className="min-h-screen p-4 max-w-md mx-auto">
+    <>
+      <FreemiumModal />
+      <div className="min-h-screen p-4 max-w-md mx-auto">
       <h1 className="text-2xl font-bold mb-6">Générateur de Pitch</h1>
       
       <textarea
@@ -174,7 +182,7 @@ export default function PitchPage() {
       <button
         className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         onClick={handleGeneratePitch}
-        disabled={loading || !profile.trim()}
+        disabled={loading || !profile.trim() || !canGenerate()}
       >
         {loading ? (
           <span className="flex items-center justify-center">
@@ -192,6 +200,34 @@ export default function PitchPage() {
           {error}
         </div>
       )}
+
+      {/* Message d'alerte limite atteinte */}
+      {currentCount === dailyLimit && (
+        <div className="mt-4 p-3 bg-red-100 text-red-700 rounded-lg border border-red-300 text-center font-semibold animate-pulse shadow">
+          🚫 Vous avez atteint votre limite gratuite pour aujourd’hui !
+        </div>
+      )}
+
+      {/* Boutons Créer un compte & Se connecter quand limite atteinte */}
+      {currentCount === dailyLimit && (
+        <div className="flex justify-center gap-2 mt-2">
+          <button
+            type="button"
+            onClick={() => window.location.href = '/sign-up'}
+            className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow hover:bg-blue-700 transition"
+          >
+            Créer un compte
+          </button>
+          <button
+            type="button"
+            onClick={() => window.location.href = '/sign-in'}
+            className="px-4 py-2 bg-gray-200 text-blue-700 font-semibold rounded-lg shadow hover:bg-gray-300 transition border border-blue-200"
+          >
+            Se connecter
+          </button>
+        </div>
+      )}
+
       
       {pitch && (
         <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200 whitespace-pre-line">
@@ -248,22 +284,7 @@ export default function PitchPage() {
             </div>
           )}
 
-          <button
-            type="button"
-            className="mt-4 w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            onClick={(e) => handleSendTelegramPDF(e)}
-            disabled={telegramPDFLoading}
-          >
-            {telegramPDFLoading ? (
-              <span className="flex items-center justify-center">
-                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Envoi PDF sur Telegram...
-              </span>
-            ) : '📄 Envoyer PDF sur Telegram'}
-          </button>
+
           {telegramPDFError && (
             <div className="mt-4 p-3 bg-red-50 text-red-600 rounded-lg border border-red-200">
               {telegramPDFError}
@@ -277,5 +298,6 @@ export default function PitchPage() {
         </div>
       )}
     </div>
+    </>
   );
 }
