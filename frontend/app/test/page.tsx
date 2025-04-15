@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, ChangeEvent, FormEvent } from 'react';
+import { saveToHistory } from '@/utils/history';
 
 interface TestForm {
   stack: string;
@@ -40,6 +41,7 @@ export default function TestPage() {
         throw new Error('Format de réponse invalide');
       }
       setResult(data.content);
+    saveToHistory({ type: "test", title: `${formData.stack} (${formData.level})`, content: data.content });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur inconnue');
     } finally {

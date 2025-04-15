@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { generatePDF } from '@/utils/pdfUtils';
+import { saveToHistory } from '@/utils/history';
 
 interface PitchResponse {
   pitch: string;
@@ -58,6 +59,7 @@ export default function PitchPage() {
         }
       );
       setPitch(data.pitch);
+    saveToHistory({ type: "pitch", title: profile, content: data.pitch });
     } catch (err: unknown) {
       if (isAxiosError(err)) {
         if (err.code === 'ECONNABORTED') {
