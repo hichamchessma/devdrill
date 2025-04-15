@@ -168,7 +168,11 @@ export default function PitchPage() {
   return (
     <>
       <FreemiumModal />
-      <div className="min-h-screen p-4 max-w-md mx-auto">
+      <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      {/* Background gradient stylé */}
+      <div className="absolute inset-0 z-0 bg-gradient-to-br from-[#a770ef] via-[#f6d365] to-[#fda085] blur-[2px] opacity-80"></div>
+      <div className="relative z-10 p-6 w-full max-w-md mx-auto bg-white/80 rounded-2xl shadow-xl border border-white/40 backdrop-blur-md">
+
       <h1 className="text-2xl font-bold mb-6">Générateur de Pitch</h1>
       
       <textarea
@@ -297,7 +301,8 @@ export default function PitchPage() {
           )}
         </div>
       )}
-    </div>
+        </div>
+      </div>
     </>
   );
 }

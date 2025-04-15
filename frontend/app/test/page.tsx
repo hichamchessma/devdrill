@@ -57,7 +57,11 @@ export default function TestPage() {
   return (
     <>
       <FreemiumModal />
-      <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+      <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        {/* Background gradient stylé */}
+        <div className="absolute inset-0 z-0 bg-gradient-to-br from-[#43cea2] via-[#185a9d] to-[#f7971e] blur-[2px] opacity-80"></div>
+        <div className="relative z-10 w-full max-w-2xl mx-auto bg-white/80 rounded-2xl shadow-xl border border-white/40 backdrop-blur-md p-6 md:p-8">
+
       <h1 className="text-2xl font-bold mb-6 text-gray-800">Générateur de Test IA</h1>
       
       <form onSubmit={handleSubmit} className="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md">
@@ -116,7 +120,8 @@ export default function TestPage() {
           <div className="prose max-w-none">{result}</div>
         </div>
       )}
-    </div>
+        </div>
+      </div>
     </>
   );
 }

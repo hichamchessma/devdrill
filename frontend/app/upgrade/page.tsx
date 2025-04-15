@@ -59,7 +59,7 @@ export default function UpgradePage() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[90vh] bg-gradient-to-br from-blue-50 to-purple-50 px-4">
+    <div className="flex flex-col items-center justify-center min-h-[90vh] bg-gradient-to-br from-purple-400 via-pink-300 to-orange-200 px-4">
       <div className="bg-white shadow-xl rounded-2xl p-8 max-w-lg w-full border border-purple-100 flex flex-col items-center">
         <h1 className="text-3xl font-bold mb-2 text-purple-700 text-center">Passez en mode Pro</h1>
         <p className="text-lg text-gray-600 mb-8 text-center">Débloquez toutes les fonctionnalités IA de DevDrill</p>
